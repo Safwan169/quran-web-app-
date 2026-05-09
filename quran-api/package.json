@@ -8,6 +8,7 @@
   "packageManager": "npm@11.12.1",
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "postbuild": "node -e \"const fs=require('fs');const path=require('path');const src=path.join('dist','src','main.js');const dest=path.join('dist','main.js');if(fs.existsSync(src)){fs.copyFileSync(src,dest);}\"",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "bun src/main.ts",
     "start:dev": "bun --hot src/main.ts",
