@@ -1,17 +1,51 @@
-import React from 'react';
-import { Surah } from '@/lib/types';
+"use client";
+
+import { FontSettings, Surah } from "@/src/lib/types";
 
 interface SurahHeaderProps {
   surah: Surah;
+  isDark?: boolean;
+  arabicFontFace: FontSettings["arabicFontFace"];
 }
 
-export function SurahHeader({ surah }: SurahHeaderProps) {
+export function SurahHeader({
+  surah,
+  isDark = false,
+  arabicFontFace,
+}: SurahHeaderProps) {
+  const arabicFontFamily = (() => {
+    switch (arabicFontFace) {
+      case "Amiri":
+        return "var(--font-amiri), serif";
+      case "Scheherazade New":
+        return "var(--font-scheherazade), serif";
+      default:
+        return '"KFGQ", serif';
+    }
+  })();
+
+  const arabicFontWeight = (() => {
+    switch (arabicFontFace) {
+      case "Amiri":
+        return 400;
+      case "Scheherazade New":
+        return 500;
+      default:
+        return 600;
+    }
+  })();
+
+  const arabicLetterSpacing = arabicFontFace === "Scheherazade New" ? "0.01em" : "0em";
+
   return (
-    <div className="bg-gradient-to-b from-primary/10 to-transparent py-12 px-6 text-center border-b border-gray-700">
-      {/* Kaaba SVG Icon */}
-      <div className="mb-6 flex justify-center">
+    <div
+      className={`border-b px-6 py-6 text-center ${
+        isDark ? "border-zinc-800" : "border-zinc-200"
+      }`}
+    >
+      <div className="mb-4 flex justify-center">
         <svg
-          className="w-24 h-24 text-primary"
+          className={`h-16 w-20 ${isDark ? "text-primary/60" : "text-zinc-300"}`}
           viewBox="0 0 100 100"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -32,19 +66,25 @@ export function SurahHeader({ surah }: SurahHeaderProps) {
           <rect x="35" y="45" width="30" height="25" stroke="currentColor" strokeWidth="1.5" fill="none" />
         </svg>
       </div>
-
-      {/* Surah Name */}
-      <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+      <h1
+        className={`text-4xl font-bold md:text-5xl ${
+          isDark ? "text-zinc-100" : "text-zinc-900"
+        }`}
+      >
         {surah.englishName}
       </h1>
-
-      {/* Arabic Name */}
-      <h2 className="text-3xl font-arabic text-primary mb-4">{surah.name}</h2>
-
-      {/* Details */}
-      <p className="text-gray-400 text-sm">
-        {surah.numberOfAyahs} Ayahs •{' '}
-        {surah.revelationType === 'Meccan' ? 'Makkah' : 'Madinah'}
+      <h2
+        className="mt-2 text-4xl text-primary"
+        style={{
+          fontFamily: arabicFontFamily,
+          fontWeight: arabicFontWeight,
+          letterSpacing: arabicLetterSpacing,
+        }}
+      >
+        {surah.name}
+      </h2>
+      <p className={`mt-2 text-sm ${isDark ? "text-zinc-400" : "text-zinc-500"}`}>
+        Ayah {surah.numberOfAyahs} · {surah.revelationType === "Meccan" ? "Makkah" : "Madinah"}
       </p>
     </div>
   );

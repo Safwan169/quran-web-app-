@@ -1,89 +1,121 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause, Loader } from 'lucide-react';
-import { getAyahAudioUrl } from '@/lib/api';
+import { Loader2, Pause, Play } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { getAyahAudioUrl } from "@/src/lib/api";
 
 interface AudioPlayerProps {
   ayahNumber: number;
-  isPlaying?: boolean;
-  onPlay?: () => void;
+  onPlay?: (ayahNumber: number) => void;
   onPause?: () => void;
+  isDark?: boolean;
 }
 
 let currentAudio: HTMLAudioElement | null = null;
+let activeAyahNumber: number | null = null;
 
 export function AudioPlayer({
   ayahNumber,
-  isPlaying = false,
   onPlay,
   onPause,
+  isDark = false,
 }: AudioPlayerProps) {
-  const [loading, setLoading] = useState(false);
-  const [playing, setPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const playerEventName = "quran-active-audio-change";
 
-  const handlePlayClick = async () => {
+  const onAudioEnded = useCallback(() => {
+    setIsPlaying(false);
+    if (activeAyahNumber === ayahNumber) {
+      activeAyahNumber = null;
+      window.dispatchEvent(
+        new CustomEvent(playerEventName, { detail: { ayahNumber: null } })
+      );
+    }
+    onPause?.();
+  }, [ayahNumber, onPause]);
+
+  const handleTogglePlay = async () => {
     try {
-      setLoading(true);
+      setIsLoading(true);
 
-      // Stop currently playing audio
       if (currentAudio && currentAudio !== audioRef.current) {
         currentAudio.pause();
-        currentAudio = null;
       }
 
       if (!audioRef.current) {
         const audio = new Audio(getAyahAudioUrl(ayahNumber));
+        audio.preload = "none";
+        audio.addEventListener("ended", onAudioEnded);
         audioRef.current = audio;
-        currentAudio = audio;
-
-        audio.addEventListener('ended', () => {
-          setPlaying(false);
-          onPause?.();
-        });
       }
+      currentAudio = audioRef.current;
 
-      if (playing) {
+      if (isPlaying) {
         audioRef.current.pause();
-        setPlaying(false);
+        setIsPlaying(false);
+        if (activeAyahNumber === ayahNumber) {
+          activeAyahNumber = null;
+          window.dispatchEvent(
+            new CustomEvent(playerEventName, { detail: { ayahNumber: null } })
+          );
+        }
         onPause?.();
       } else {
         await audioRef.current.play();
-        setPlaying(true);
-        onPlay?.();
+        setIsPlaying(true);
+        activeAyahNumber = ayahNumber;
+        window.dispatchEvent(
+          new CustomEvent(playerEventName, { detail: { ayahNumber } })
+        );
+        onPlay?.(ayahNumber);
       }
     } catch (error) {
-      console.error('Error playing audio:', error);
-      setPlaying(false);
+      console.error("Error playing ayah audio:", error);
+      setIsPlaying(false);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
+    const handleActiveAudioChange = (event: Event) => {
+      const customEvent = event as CustomEvent<{ ayahNumber: number | null }>;
+      const nextAyah = customEvent.detail?.ayahNumber ?? null;
+      if (nextAyah !== ayahNumber && isPlaying) {
+        audioRef.current?.pause();
+        setIsPlaying(false);
       }
     };
-  }, []);
+
+    window.addEventListener(playerEventName, handleActiveAudioChange);
+    return () => {
+      window.removeEventListener(playerEventName, handleActiveAudioChange);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.removeEventListener("ended", onAudioEnded);
+      }
+      if (activeAyahNumber === ayahNumber) {
+        activeAyahNumber = null;
+      }
+    };
+  }, [ayahNumber, isPlaying, onAudioEnded]);
 
   return (
     <button
-      onClick={handlePlayClick}
-      disabled={loading}
-      className={`p-2 rounded-lg transition-colors ${
-        playing
-          ? 'bg-primary text-white'
-          : 'bg-gray-700 text-white hover:bg-primary'
-      } disabled:opacity-50 disabled:cursor-not-allowed`}
+      onClick={handleTogglePlay}
+      disabled={isLoading}
+      className={`rounded-lg border p-2 transition disabled:cursor-not-allowed disabled:opacity-60 ${
+        isDark
+          ? "border-zinc-700 text-zinc-200 hover:border-primary hover:text-white"
+          : "border-zinc-200 text-zinc-600 hover:border-primary hover:text-primary"
+      }`}
       aria-label="Play audio"
-      title="Play audio"
     >
-      {loading ? (
-        <Loader size={18} className="animate-spin" />
-      ) : playing ? (
+      {isLoading ? (
+        <Loader2 size={18} className="animate-spin" />
+      ) : isPlaying ? (
         <Pause size={18} />
       ) : (
         <Play size={18} />

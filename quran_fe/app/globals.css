@@ -1,26 +1,57 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@font-face {
+  font-family: "KFGQ";
+  src: url("https://fonts.quran.foundation/kfgqpcuthmanic.ttf")
+    format("truetype");
+  font-display: swap;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Dark theme (default) */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --page-bg: #000000;
+  --page-text: #ffffff;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Light theme */
+[data-theme="light"] {
+  color-scheme: light;
+  --page-bg: #ffffff;
+  --page-text: #2f3437;
+}
+
+html,
+body {
+  min-height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply font-inter;
+  background-color: var(--page-bg);
+  color: var(--page-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Surah sidebar scrollbar (Firefox) */
+[data-theme="dark"] .surah-scroll {
+  scrollbar-width: none;
+}
+
+[data-theme="light"] .surah-scroll {
+  scrollbar-width: none;
+}
+
+/* Surah sidebar scrollbar (WebKit) */
+.surah-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.surah-scroll {
+  scrollbar-gutter: stable;
 }

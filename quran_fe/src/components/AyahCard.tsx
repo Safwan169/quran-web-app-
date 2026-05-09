@@ -1,105 +1,115 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Play, Bookmark, MoreVertical } from 'lucide-react';
-import { Ayah, FontSettings } from '@/lib/types';
-import { AudioPlayer } from './AudioPlayer';
+import { Bookmark, MoreHorizontal } from "lucide-react";
+import { useState } from "react";
+import { Ayah, FontSettings } from "@/src/lib/types";
+import { AudioPlayer } from "./AudioPlayer";
 
 interface AyahCardProps {
   ayah: Ayah;
   surahNumber: number;
   fontSettings: FontSettings;
-  isPlaying?: boolean;
-  onPlayAudio?: (ayahNumber: number) => void;
+  isDark?: boolean;
 }
 
 export function AyahCard({
   ayah,
   surahNumber,
   fontSettings,
-  isPlaying = false,
-  onPlayAudio,
+  isDark = false,
 }: AyahCardProps) {
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-  const getFontFamilyClass = () => {
+  const arabicFontFamily = (() => {
     switch (fontSettings.arabicFontFace) {
-      case 'Amiri':
-        return 'font-amiri';
-      case 'Scheherazade New':
-        return 'font-arabic';
-      case 'KFGQ':
+      case "Amiri":
+        return "var(--font-amiri), serif";
+      case "Scheherazade New":
+        return "var(--font-scheherazade), serif";
       default:
-        return 'font-kfgq';
+        return '"KFGQ", serif';
     }
-  };
+  })();
+
+  const arabicFontWeight = (() => {
+    switch (fontSettings.arabicFontFace) {
+      case "Amiri":
+        return 400;
+      case "Scheherazade New":
+        return 500;
+      default:
+        return 600;
+    }
+  })();
+
+  const arabicLetterSpacing = fontSettings.arabicFontFace === "Scheherazade New" ? "0.01em" : "0em";
 
   return (
-    <div className="bg-dark-card rounded-lg p-8 mb-6 border border-gray-700 hover:border-primary/50 transition-colors">
-      {/* Header with Reference */}
-      <div className="flex items-start justify-between mb-6">
-        <div className="flex items-start gap-4">
-          {/* Verse Reference */}
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-12 h-12 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center">
-              <span className="text-primary font-bold text-sm">
-                {surahNumber}:{ayah.numberInSurah}
-              </span>
-            </div>
-            <AudioPlayer
-              ayahNumber={ayah.number}
-              isPlaying={isPlaying}
-              onPlay={() => onPlayAudio?.(ayah.number)}
-            />
-          </div>
-
-          {/* Arabic Text */}
-          <div className="flex-1">
-            <p
-              className={`${getFontFamilyClass()} text-white text-right leading-relaxed`}
-              style={{ fontSize: `${fontSettings.arabicFontSize}px` }}
-            >
-              {ayah.text}
-            </p>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-2 ml-4">
+    <article className={`border-b py-8 ${isDark ? "border-zinc-800" : "border-zinc-200"}`}>
+      <div className="flex items-start gap-5">
+        <div className="flex min-w-[72px] flex-col items-center gap-2">
+          <span className="text-sm font-semibold text-primary">
+            {surahNumber}:{ayah.numberInSurah}
+          </span>
+          <AudioPlayer ayahNumber={ayah.number} isDark={isDark} />
           <button
-            onClick={() => setIsBookmarked(!isBookmarked)}
-            className={`p-2 rounded-lg transition-colors ${
+            onClick={() => setIsBookmarked((value) => !value)}
+            aria-label="Bookmark ayah"
+            className={`rounded-md border p-2 transition ${
               isBookmarked
-                ? 'bg-primary/20 text-primary'
-                : 'text-gray-400 hover:bg-gray-700 hover:text-white'
+                ? "border-primary text-primary"
+                : isDark
+                  ? "border-zinc-700 text-zinc-400 hover:text-zinc-200"
+                  : "border-zinc-200 bg-zinc-50 text-zinc-500 hover:text-zinc-800"
             }`}
-            aria-label="Bookmark"
-            title="Bookmark"
           >
-            <Bookmark size={20} />
+            <Bookmark size={16} />
           </button>
           <button
-            className="p-2 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition-colors"
-            aria-label="More options"
-            title="More options"
+            aria-label="Ayah menu"
+            className={`rounded-md border p-2 transition ${
+              isDark
+                ? "border-zinc-700 text-zinc-400 hover:text-zinc-200"
+                : "border-zinc-200 bg-zinc-50 text-zinc-500 hover:text-zinc-800"
+            }`}
           >
-            <MoreVertical size={20} />
+            <MoreHorizontal size={16} />
           </button>
         </div>
-      </div>
 
-      {/* Translation */}
-      <div className="bg-dark-bg rounded p-4 mt-6">
-        <p className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-3">
-          Saheeh International
-        </p>
-        <p
-          className="text-gray-300 leading-relaxed"
-          style={{ fontSize: `${fontSettings.translationFontSize}px` }}
-        >
-          {ayah.translation}
-        </p>
+        <div className="flex-1">
+          <p
+            className={`text-right leading-[2.1] ${
+              isDark ? "text-zinc-100" : "text-zinc-900"
+            }`}
+            style={{
+              fontSize: `${fontSettings.arabicFontSize}px`,
+              fontFamily: arabicFontFamily,
+              fontWeight: arabicFontWeight,
+              letterSpacing: arabicLetterSpacing,
+            }}
+          >
+            {ayah.text}
+          </p>
+          {fontSettings.showTranslation && (
+            <div className="mt-6">
+              <p
+                className={`text-[11px] uppercase tracking-[0.18em] ${
+                  isDark ? "text-zinc-500" : "text-zinc-500"
+                }`}
+              >
+                SAHEEH INTERNATIONAL
+              </p>
+              <p
+                className={`mt-2 ${isDark ? "text-zinc-300" : "text-zinc-700"}`}
+                style={{ fontSize: `${fontSettings.translationFontSize}px` }}
+              >
+                {ayah.translation}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </article>
   );
 }

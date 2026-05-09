@@ -1,6 +1,6 @@
 # Quran API
 
-Quran API is a NestJS REST backend for Quran text, surah metadata, ayah pagination, full-text search, reciter audio URLs, audio proxy streaming, and Arabic font metadata. It uses TypeScript, SQLite through `better-sqlite3`, raw SQL repositories, Swagger/OpenAPI, and automatic first-run seeding from public Quran JSON sources.
+Quran API is a Hono backend running on Bun for Quran text, surah metadata, ayah pagination, full-text search, reciter audio URLs, audio proxy streaming, and Arabic font metadata. It uses TypeScript, Turso/libSQL (`@libsql/client`), and automatic first-run seeding from public Quran JSON sources.
 
 ## Getting Started
 
@@ -9,16 +9,11 @@ npm install
 npm run start:dev
 ```
 
-Swagger UI is available at:
+You can also use Bun directly:
 
-```text
-http://localhost:3000/api/docs
-```
-
-The OpenAPI JSON spec is available at:
-
-```text
-http://localhost:3000/api/docs-json
+```bash
+bun install
+bun --hot src/main.ts
 ```
 
 ## Seeding
@@ -51,8 +46,9 @@ npm run seed:check
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `PORT` | `3000` | HTTP port for the NestJS server |
-| `DB_PATH` | `./quran.sqlite` | SQLite database file path |
+| `PORT` | `3000` | HTTP port for the Hono server |
+| `TURSO_CONNECTION_URL` | - | Turso/libSQL connection URL |
+| `TURSO_AUTH_TOKEN` | - | Turso auth token (optional for local libSQL) |
 | `NODE_ENV` | `development` | Runtime environment |
 
 ## Notes

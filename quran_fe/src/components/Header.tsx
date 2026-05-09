@@ -1,61 +1,103 @@
 'use client';
 
-import React from 'react';
-import { Search, Settings, Moon, Sun } from 'lucide-react';
+import { Heart, Menu, Moon, Search, Settings, Sun } from "lucide-react";
 
 interface HeaderProps {
-  onSearchClick?: () => void;
-  onSettingsClick?: () => void;
-  darkMode?: boolean;
-  onThemeToggle?: () => void;
+  onSearchClick: () => void;
+  onSettingsClick: () => void;
+  isDark: boolean;
+  onThemeToggle: () => void;
+  onMobileDrawerToggle: () => void;
 }
 
 export function Header({
   onSearchClick,
   onSettingsClick,
-  darkMode = true,
+  isDark,
   onThemeToggle,
+  onMobileDrawerToggle,
 }: HeaderProps) {
   return (
-    <div className="sticky top-0 z-40 bg-dark-card/80 backdrop-blur border-b border-gray-700 px-6 py-4">
-      <div className="flex items-center justify-between">
-        <div className="flex-1" />
+    <div
+      className={`fixed left-0 top-0 z-50 h-12 w-full border-b px-3 py-1.5 backdrop-blur md:left-14 md:h-16 md:w-[calc(100%-56px)] ${
+        isDark
+          ? "border-zinc-800 bg-dark-bg/95"
+          : "border-zinc-200 bg-white/95"
+      }`}
+    >
+      <div className="flex h-full items-center justify-between gap-2">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onMobileDrawerToggle}
+            className={`rounded-md p-2 md:hidden ${
+              isDark
+                ? "text-zinc-300 hover:bg-zinc-800"
+                : "text-zinc-500 hover:bg-zinc-100"
+            }`}
+            aria-label="Open surah drawer"
+          >
+            <Menu size={20} />
+          </button>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-4">
-          {/* Search Button */}
+          <div className="hidden md:block">
+            <p
+              className={`text-[28px] font-semibold leading-none ${
+                isDark ? "text-zinc-100" : "text-zinc-800"
+              }`}
+            >
+              Quran Mazid
+            </p>
+            <p className={`text-xs ${isDark ? "text-zinc-400" : "text-zinc-500"}`}>
+              Read, Study, and Learn The Quran
+            </p>
+          </div>
+        </div>
+
+        <div className="ml-auto flex items-center gap-3">
           <button
             onClick={onSearchClick}
-            className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
-            aria-label="Search"
-            title="Search"
+            className={`grid h-9 w-9 place-items-center rounded-full transition ${
+              isDark
+                ? "bg-transparent text-zinc-300 hover:bg-zinc-800"
+                : "bg-transparent text-primary hover:bg-zinc-100"
+            }`}
+            aria-label="Open search"
           >
-            <Search size={20} />
+            <Search size={16} />
           </button>
-
-          {/* Theme Toggle */}
           <button
             onClick={onThemeToggle}
-            className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
+            className={`grid h-9 w-9 place-items-center rounded-full transition ${
+              isDark
+                ? "bg-transparent text-zinc-300 hover:bg-zinc-800"
+                : "bg-transparent text-primary hover:bg-zinc-100"
+            }`}
             aria-label="Toggle theme"
-            title="Toggle theme"
           >
-            {darkMode ? <Moon size={20} /> : <Sun size={20} />}
+            {isDark ? <Moon size={16} /> : <Sun size={16} />}
           </button>
-
-          {/* Settings Button */}
           <button
             onClick={onSettingsClick}
-            className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
-            aria-label="Settings"
-            title="Settings"
+            className={`grid h-9 w-9 place-items-center rounded-full transition ${
+              isDark
+                ? "bg-transparent text-zinc-300 hover:bg-zinc-800"
+                : "bg-transparent text-primary hover:bg-zinc-100"
+            }`}
+            aria-label="Open settings"
           >
-            <Settings size={20} />
+            <Settings size={16} />
           </button>
-
-          {/* Support Button */}
-          <button className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-light transition-colors">
-            Support Us
+          <button
+            className={`rounded-full px-4 py-1.5 text-sm font-semibold text-white transition ${
+              isDark
+                ? "bg-primary hover:bg-primary-light"
+                : "bg-primary hover:bg-primary-light"
+            }`}
+          >
+            <span className="inline-flex items-center gap-2">
+              Support Us
+              <Heart size={14} fill="currentColor" />
+            </span>
           </button>
         </div>
       </div>

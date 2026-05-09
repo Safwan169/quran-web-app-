@@ -4,14 +4,14 @@ export interface Surah {
   englishName: string;
   englishNameTranslation: string;
   numberOfAyahs: number;
-  revelationType: 'Meccan' | 'Medinan';
+  revelationType: string;
 }
 
 export interface Ayah {
   number: number;
   numberInSurah: number;
   text: string;
-  translation?: string;
+  translation: string;
 }
 
 export interface SurahData {
@@ -22,30 +22,26 @@ export interface SurahData {
 export interface FontSettings {
   arabicFontSize: number;
   translationFontSize: number;
-  arabicFontFace: 'KFGQ' | 'Amiri' | 'Scheherazade New';
+  arabicFontFace: "KFGQ" | "Amiri" | "Scheherazade New";
+  showTranslation: boolean;
+}
+
+export interface EditionAyah {
+  number: number;
+  numberInSurah: number;
+  text: string;
 }
 
 export interface EditionData {
+  name: string;
+  englishName: string;
+  englishNameTranslation: string;
+  revelationType: string;
+  numberOfAyahs: number;
   edition: {
     identifier: string;
-    language: string;
-    name: string;
-    englishName: string;
-    format: string;
-    type: string;
   };
-  ayahs: Array<{
-    number: number;
-    numberInSurah: number;
-    numberInQuran: number;
-    juz: number;
-    manzil: number;
-    page: number;
-    ruku: number;
-    hizbQuarter: number;
-    sajdah: boolean;
-    text: string;
-  }>;
+  ayahs: EditionAyah[];
 }
 
 export interface ApiSurah {
